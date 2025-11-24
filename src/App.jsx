@@ -19,6 +19,7 @@ import BlogPage from "./pages/BlogPage";
 import SingleproductPage from "./pages/SingleProductPage";
 import SingleblogPage from "./pages/SingleblogPage";
 import PrivacypolicyPage from "./pages/PrivacypolicyPage";
+import SingleProduct from "./component/Newsingleproduct";
 
 // Scroll to Top Component
 const ScrollToTop = () => {
@@ -50,10 +51,13 @@ const ConditionalLayout = () => {
 
       <Routes>
         <Route path="/" element={<Homepage />} />
+        
         <Route path="/about" element={<AboutPage />} />
         <Route path="/product" element={<ProductPage />} />
         <Route path="/contact" element={<ContactUs />} />
         <Route path="/singleproduct/:id" element={<SingleproductPage />} />
+        <Route path="/newsingleProduct/:id" element={<SingleProduct />} />
+
         <Route path="/blog" element={<BlogPage />} />
         <Route path="/singleblog/:id" element={<SingleblogPage />} />
         <Route path="/privacypolicy" element={<PrivacypolicyPage />} />

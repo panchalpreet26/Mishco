@@ -1,126 +1,247 @@
-import React from "react";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
-import productimg from "../assets/image/product/product1.png";
-import { motion } from "framer-motion";
+import { m, motion } from "framer-motion";
+import axios from "axios";
+import { Api } from "../api";
+import { Arrowsvg } from "./arrowsvg";
+import { RightArrow } from "./RightArrowsvg";
+import ProductDetailModal from "./ProductDetailModal";
+
+const API_BASE_URL = Api;
+const MIN_LOADING_TIME = 500; // 2 seconds minimum display time
 
 export default function ProductShowcase() {
-  // Animation variants
-  const leftVariant = {
-    hidden: { x: -100, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
-  };
+    const [products, setProducts] = useState([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [loading, setLoading] = useState(true);
 
-  const rightVariant = {
-    hidden: { x: 100, opacity: 0 },
-    visible: { x: 0, opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
-  };
+    const [showFullLeft, setShowFullLeft] = useState(false);
+    const [showFullRight, setShowFullRight] = useState(false);
+    const productid = sessionStorage.getItem("currentProductId");
 
-  const centerVariant = {
-    hidden: { y: 50, opacity: 0, scale: 0.8 },
-    visible: { y: 0, opacity: 1, scale: 1, transition: { duration: 0.8, ease: "easeOut" } },
-  };
+    const [isModalOpen, setIsModalOpen] = useState(false);
 
-  return (
-    <>
-      {/* INTERNAL CSS */}
-      <style>{`
-        .product-arc {
-          background-color: #673ab7;
-          width: 100%;
-          max-width: 360px;
-          border-radius: 50% 50% 0 0;
-          padding-top: 40px;
-        }
+    useEffect(() => {
+        const fetchProductById = async () => {
+            const productId = sessionStorage.getItem("currentProductId");
 
-        .product-img {
-          width: 100%;
-          max-width: 260px;
-        }
+            if (!productId) {
+                console.error("No product ID found in sessionStorage");
+                setLoading(false);
+                return;
+            }
 
-        @media (max-width: 768px) {
-          .product-arc {
-            max-width: 280px;
-          }
-          .product-img {
-            max-width: 200px;
-          }
-        }
-      `}</style>
+            setLoading(true);
+            const startTime = Date.now(); // ⭐ START TIMER
 
-      <div className="container py-5">
+            try {
+                const response = await axios.get(
+                    `${API_BASE_URL}/api/products/getbyid/${productId}`
+                );
 
-        {/* ---- HEADER ---- */}
-        <div className="text-center mb-5 p-5 mx-5" style={{ fontFamily: "Sen, sans-serif", backgroundColor: "#EAF5FF" }}>
-          <p className="text-uppercase small text-secondary fw-semibold mb-1 text-start">
-            Our Product
-          </p>
-          <h3 className="fw-bold text-start">
-            Lorem ipsum dolor sit amet, consectetur  <br />adipiscing elit
-          </h3>
-        </div>
+                if (response.data.success && response.data.data) {
+                    setProducts([response.data.data]);
+                } else {
+                    console.error(
+                        "Product not found or API response failed:",
+                        response.data
+                    );
+                }
+            } catch (err) {
+                console.error(
+                    "Error fetching product:",
+                    err.response?.data || err.message
+                );
+            } finally {
+                // ⭐ ENFORCE MINIMUM 2-SECOND DELAY ⭐
+                const elapsedTime = Date.now() - startTime;
+                const remainingTime = MIN_LOADING_TIME - elapsedTime;
 
-        <div className="row align-items-center justify-content-center">
+                if (remainingTime > 0) {
+                    setTimeout(() => {
+                        setLoading(false);
+                    }, remainingTime);
+                } else {
+                    setLoading(false);
+                }
+            }
+        };
 
-          {/* ---- LEFT TEXT ---- */}
-          <motion.div
-            className="col-12 col-md-3 text-center text-md-end mb-4 mb-md-0"
-            variants={leftVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <h6 className="fw-bold">DIGESTIVE ENZYMES SYRUP</h6>
-            <p className="small text-muted">
-              We Specialise In Short And Long Stays For Contractors In And Around Whyalla.
-            </p>
-          </motion.div>
+        fetchProductById();
+    }, []);
 
-          {/* ---- CENTER PRODUCT ---- */}
-          <motion.div
-            className="col-12 col-md-6 text-center"
-            variants={centerVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <div className="product-arc mx-auto p-4">
-              <img
-                src={productimg}
-                alt="Product"
-                className="img-fluid mb-3 product-img"
-              />
-              <div className="d-flex justify-content-center gap-3">
-                <button className="btn btn-link text-white fw-semibold p-0">
-                  &lt; Prev
-                </button>
-                <button className="btn btn-link text-white fw-semibold p-0">
-                  Next &gt;
-                </button>
-              </div>
+    const goNext = () => {
+        setCurrentIndex((prev) => (prev + 1) % products.length);
+        setShowFullLeft(false);
+        setShowFullRight(false);
+    };
+
+    const goPrev = () => {
+        setCurrentIndex((prev) => (prev - 1 + products.length) % products.length);
+        setShowFullLeft(false);
+        setShowFullRight(false);
+    };
+
+    const getImageUrl = (imgArray) =>
+        Array.isArray(imgArray) && imgArray.length > 0
+            ? `${API_BASE_URL}${imgArray[0].replace(/\\/g, "/")}`
+            : "https://via.placeholder.com/260x260/cccccc/000000?text=No+Image";
+
+    const openModal = () => setIsModalOpen(true);
+    const closeModal = () => setIsModalOpen(false);
+
+    // ⭐ VERTICALLY CENTERED LOADING BAR JSX ⭐
+    if (loading) {
+        return (
+            <div 
+                className="d-flex justify-content-center align-items-center" 
+                style={{ minHeight: '70vh' }} // Centers the spinner vertically in a large portion of the viewport
+            >
+                <div className="spinner-border text-primary" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
             </div>
-          </motion.div>
+        );
+    }
 
-          {/* ---- RIGHT TEXT ---- */}
-          <motion.div
-            className="col-12 col-md-3 text-center text-md-start mt-4 mt-md-0"
-            variants={rightVariant}
-            initial="hidden"
-            whileInView="visible"
-            viewport={{ once: true }}
-          >
-            <h6 className="fw-bold">MISTDIGEST SYRUP</h6>
-            <p className="small text-muted">
-              We Specialise In Short And Long Stays For Contractors In And Around Whyalla.
-            </p>
-            <ul className="list-unstyled small">
-              <li>• 200ML</li>
-              <li>• HEALTH SUPPLEMENT</li>
-              <li>• VEGAN</li>
-            </ul>
-          </motion.div>
+    if (products.length === 0) {
+        return (
+            <div className="text-center py-5">
+                <h4 className="text-danger">Product data could not be loaded.</h4>
+            </div>
+        );
+    }
 
-        </div>
-      </div>
-    </>
-  );
+    const current = products[currentIndex];
+    const mainColor = current.color || "#673ab7";
+
+    return (
+        <>
+            <div className="container ">
+                {/* Header */}
+                <div
+                    className="text-center my-4 p-3 p-md-5 mx-md-5 rounded-4"
+                    style={{ backgroundColor: "#EAF5FF", fontFamily: "Sen, sans-serif" }}
+                >
+                    <p className="text-uppercase small text-secondary fw-bold mb-1 text-start">
+                        {current.category?.name || "Uncategorized"}
+                    </p>
+                    <h3 className="fw-bold text-start">
+                        {current.productName || current.genericName}
+                    </h3>
+                    <p className="text-start text-muted small">
+                        {current.genericName || current.brandName}
+                    </p>
+                </div>
+
+                {/* Main Content Row */}
+                <div className="row my-5 d-flex align-items-center">
+                    {/* Product Image Column */}
+                    <div className="col-12 col-lg-4 text-center mb-3 mb-lg-0">
+                        <motion.div
+                            key={currentIndex}
+                            initial={{ y: 50, opacity: 0 }}
+                            animate={{ y: 0, opacity: 1 }}
+                            transition={{
+                                type: "spring",
+                                stiffness: 50,
+                                damping: 10,
+                            }}
+                            className="d-inline-block position-relative"
+                        >
+                            <div
+                                className="main-arc position-relative"
+                                style={{
+                                    width: "350px",
+                                    height: "540px",
+                                    borderRadius: "190px 190px 0 0",
+                                    background: mainColor,
+                                    paddingTop: "60px",
+                                    boxShadow: "0 30px 60px rgba(0, 0, 0, 0.25)",
+                                    position: "relative",
+                                    zIndex: 1,
+                                    marginLeft: "auto",
+                                    marginRight: "auto",
+                                }}
+                            >
+                                {/* Main Product Image */}
+                                <img
+                                    src={getImageUrl(current.productImage)}
+                                    alt={current.productName}
+                                    className="main-img img-fluid"
+                                    style={{
+                                        position: "relative",
+                                        zIndex: 2,
+                                        bottom: "-12%",
+                                        maxWidth: "270px",
+                                        marginTop: "-10px",
+                                    }}
+                                />
+                            </div>
+                        </motion.div>
+                        <p className="text-danger small mt-5">*{current.storage}</p>
+                    </div>
+
+                    {/* Product Details Column */}
+                    <div className="col-12 col-lg-8 p-3 p-lg-5">
+                        <h2>{current.genericName}</h2>
+                        <br />
+                        {current.mechanismOfAction &&
+                            current.mechanismOfAction.length > 0 && (
+                                <>
+                                    {/* First Drug */}
+                                    {current.mechanismOfAction[0] && (
+                                        <div className="mb-4">
+                                            <h3 className="h4 fw-bold text-dark">
+                                                {current.mechanismOfAction[0].drug}
+                                            </h3>
+                                            <p className="text-muted fs-6 lh-base">
+                                                {current.mechanismOfAction[0].moa ||
+                                                    "Mechanism information not available"}
+                                            </p>
+                                        </div>
+                                    )}
+
+                                    {/* Second Drug (Optional) */}
+                                    {current.mechanismOfAction[1] && (
+                                        <div className="mb-4">
+                                            <h3 className="h4 fw-bold text-dark">
+                                                {current.mechanismOfAction[1].drug}
+                                            </h3>
+                                            <p className="text-muted fs-6 lh-base">
+                                                {current.mechanismOfAction[1].moa ||
+                                                    "Mechanism information not available"}
+                                            </p>
+                                        </div>
+                                    )}
+                                </>
+                            )}
+
+                        <h2>{current.packSize}</h2>
+                        <br />
+
+                        {/* View More Button */}
+                        <button
+                            className="btn fw-bold mt-4 p-2  rounded-lg"
+                            style={{
+                                fontFamily: "Sen, sans-serif",
+                            }}
+                            onClick={openModal}
+                        >
+                            View more
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            {/* Product Detail Modal */}
+            {current && (
+                <ProductDetailModal
+                    show={isModalOpen}
+                    handleClose={closeModal}
+                    product={current}
+                />
+            )}
+        </>
+    );
 }
