@@ -12,7 +12,7 @@ const slides = [
     img: hero2,
     tag: "Global Healthcare",
     title: "Quality, Trust, and 45+ Years of Experience",
-    desc: "We are driven by a single purpose: to make quality healthcare accessible and affordable worldwide. Headquartered in Ahmedabad, India.Z",
+    desc: "We are driven by a single purpose: to make quality healthcare accessible and affordable worldwide. Headquartered in Ahmedabad, India.",
   },
   {
     id: 2,

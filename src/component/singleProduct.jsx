@@ -3,8 +3,8 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { m, motion } from "framer-motion";
 import axios from "axios";
 import { Api } from "../api";
-import { Arrowsvg } from "./arrowsvg";
-import { RightArrow } from "./RightArrowsvg";
+// import { Arrowsvg } from "./arrowsvg";
+// import { RightArrow } from "./RightArrowsvg";
 import ProductDetailModal from "./ProductDetailModal";
 
 const API_BASE_URL = Api;
