@@ -186,12 +186,49 @@ const Contact = () => {
                 >
                   Phone & Email
                 </p>
+
+                {/* Phone */}
                 <p style={styles.infoDetail}>+91-8980001090</p>
+
+                {/* General Email */}
                 <p
                   className="small"
                   style={{ fontFamily: "Inter, sans-serif" }}
                 >
-                  info@mishcolife.com
+                  <a
+                    href="mailto:info@mishcolife.com"
+                    className="text-decoration-none text-white"
+                  >
+                    info@mishcolife.com
+                  </a>
+                </p>
+
+                {/* International Enquiry */}
+                <p
+                  className="small"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  International Enquiry:&nbsp;
+                  <a
+                    href="mailto:nikhil@mishcolife.com"
+                    className="text-decoration-none text-white"
+                  >
+                    nikhil@mishcolife.com
+                  </a>
+                </p>
+
+                {/* Procurement */}
+                <p
+                  className="small"
+                  style={{ fontFamily: "Inter, sans-serif" }}
+                >
+                  Procurement:&nbsp;
+                  <a
+                    href="mailto:purchase@mishcolife.com"
+                    className="text-decoration-none text-white"
+                  >
+                    purchase@mishcolife.com
+                  </a>
                 </p>
               </div>
             </motion.div>
@@ -244,7 +281,6 @@ const Contact = () => {
                   <option value="Technical Support">Technical Support</option>
                   <option value="Feedback">Feedback</option>
                   <option value="Other">Other</option>
-                  
                 </select>
               </div>
               <div className="mb-4">

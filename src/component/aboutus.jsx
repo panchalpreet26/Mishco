@@ -133,6 +133,12 @@ const AboutPage = () => {
         z-index: 1;
        }
       }
+       @media (max-width: 768px) {
+  .about-right-box p {
+    text-align: center !important;
+  }
+}
+
      `}
       </style>
       {/* ------------ HEADER SECTION (Updated) ------------- */}
@@ -170,7 +176,10 @@ const AboutPage = () => {
             viewport={{ once: true }}
           >
             <p className="text-muted" style={{ lineHeight: "26px" }}>
-              Mishco Lifescience LLP is an Ahmedabad, India-based, WHO-GMP compliant pharmaceutical company specializing in affordable branded generic formulations and nutraceuticals for global export and marketing.
+              Mishco Lifescience LLP is an Ahmedabad, India-based, WHO-GMP
+              compliant pharmaceutical company specializing in affordable
+              branded generic formulations and nutraceuticals for global export
+              and marketing.
             </p>
           </motion.div>
         </div>
@@ -261,11 +270,12 @@ const AboutPage = () => {
                 className="text-muted small"
                 style={{ fontFamily: "Inter ,sans-serif" }}
               >
-                Our founding principle is to deliver high-quality, <strong>reliable,
-                and affordable</strong> branded generic formulations. We operate with a
-                strong sense of responsibility toward patients and healthcare
-                providers, ensuring every product we develop, market, and export
-                meets the most stringent standards of efficacy and compliance.
+                Our founding principle is to deliver high-quality,{" "}
+                <strong>reliable, and affordable</strong> branded generic
+                formulations. We operate with a strong sense of responsibility
+                toward patients and healthcare providers, ensuring every product
+                we develop, market, and export meets the most stringent
+                standards of efficacy and compliance.
               </p>
             </motion.div>
             {/* Vision */}
@@ -290,10 +300,11 @@ const AboutPage = () => {
                 style={{ fontFamily: "Inter ,sans-serif" }}
               >
                 We aim to continuously expand our global reach into markets like
-                CIS, MENA, Kenya, and Thailand, focusing on <strong>innovative
-                formulations</strong> and robust supply chains. We strive to be the
-                preferred partner for clients seeking <strong>WHO-GMP compliant</strong>,
-                customized, and ethically sourced healthcare products.
+                CIS, MENA, Kenya, and Thailand, focusing on{" "}
+                <strong>innovative formulations</strong> and robust supply
+                chains. We strive to be the preferred partner for clients
+                seeking <strong>WHO-GMP compliant</strong>, customized, and
+                ethically sourced healthcare products.
               </p>
             </motion.div>
           </div>
